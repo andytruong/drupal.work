@@ -1,31 +1,22 @@
 {
-	"title": "Welcome to myword.io!",
-	"description": "An easy open source way to create nice-looking web pages for essays.",
-	"authorname": "Dave Winer",
-	"authorwebsite": "http://scripting.com/",
+	"title": "Welcome to Drupal.work!",
+	"description": "Drupal is rock. Let's study together",
+	"authorname": "Andy Truong",
+	"authorwebsite": "http://v3k.net/",
 	"when": "Thu, 12 Feb 2015 16:52:05 GMT",
-	"img": "http://scripting.com/2015/02/12/beatles.png",
+	"img": "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xpa1/t31.0-8/1669953_808871765789853_9185670025657170320_o.png",
 	"titlefont": "Ubuntu",
 	"bodyfont": "Georgia",
 	"subs": [
-		"My name is Dave Winer. I wanted an easy way to make nice-looking web pages for essays. That's how I arrived at myword.io.",
-		"It's a very simple JavaScript app embedded in a web page. It's so simple, there's almost nothing to it. I've shared the <a href=\"https://github.com/scripting/myWord\">source code</a> on GitHub, and licensed it as open source, so you can see for yourself, and use it however you like.",
+		"I am Andy Truong. I want sharing my Drupal knowlege!",
 		{
-			"title": "The app and website",
+			"title": "My presentations",
 			"subs": [
-				"The app reads a simple <a href=\"http://en.wikipedia.org/wiki/JSON\">JSON</a> format. Here's an example <a href=\"https://dl.dropboxusercontent.com/u/36518280/misc/myWordDemo.json\">file</a>. The text you're reading right now comes from a <a href=\"http://myword.io/essay.json\">JSON file</a>. It would be really easy to create a simple text editor that produces these files, hiding the technical details from users.",
-				"There's a standalone public web page version at <a href=\"http://myword.io/\">myword.io</a>. It takes an optional <i>url</i> parameter, which specifies the address of the JSON file to use. If none is specified, we read the file <i>essay.json</i> in the same directory as the HTML page. ",
-				"Here's an <a href=\"http://myword.io/?url=https://dl.dropboxusercontent.com/u/36518280/misc/myWordDemo.json\">example</a> of myword.io being used to display the contents of the example <a href=\"https://dl.dropboxusercontent.com/u/36518280/misc/myWordDemo.json\">file</a> stored in my public Dropbox folder."
-				]
-			},
-		{
-			"title": "Where to go from here",
-			"subs": [
-				"If you have suggestions, feel free to post them as a reply to <a href=\"http://scripting.com/2015/02/12/somethingFunIWhippedUp.html\">this blog post</a>.",
-				"That's about it for now. I hope you enjoy myword.io. Feel free to use it, or the standalone public web page version. And if you agree, tell other people you think it's cool.",
-				"<a href=\"http://scripting.com/\">Dave</a>",
-				"PS: Phil Windley <a href=\"http://www.windley.com/archives/2015/02/myword.shtml\">loves</a> myword.io! :-)"
+			  "- <a href='http://slides.com/andytruong/drupal-8'>Drupal 8</a>",
+			  "- <a href='http://slides.com/andytruong/psr-0-psr-4-and-composer'>PSR-0, PSR-4 & xAutoload module</a>",
+			  "- <a href='https://hackpad.com/Entity-API-mwibBSkJ2uK'>Entity API</a>",
+				"- <a href='https://hackpad.com/Composer-Drupal-xNseeMzik0c'>Composer & Drupal</a>"
 				]
 			}
 		]
-	}
+}
