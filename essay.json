@@ -1,22 +1,23 @@
 {
-	"title": "Welcome to Drupal.work!",
-	"description": "Drupal is rock. Let's study together",
-	"authorname": "Andy Truong",
-	"authorwebsite": "http://v3k.net/",
-	"when": "Thu, 12 Feb 2015 16:52:05 GMT",
-	"img": "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xpa1/t31.0-8/1669953_808871765789853_9185670025657170320_o.png",
-	"titlefont": "Ubuntu",
-	"bodyfont": "Georgia",
-	"subs": [
-		"I am Andy Truong. I want sharing my Drupal knowlege!",
-		{
-			"title": "My presentations",
-			"subs": [
-			  "- <a href='http://slides.com/andytruong/drupal-8'>Drupal 8</a>",
-			  "- <a href='http://slides.com/andytruong/psr-0-psr-4-and-composer'>PSR-0, PSR-4 & xAutoload module</a>",
-			  "- <a href='https://hackpad.com/Entity-API-mwibBSkJ2uK'>Entity API</a>",
-				"- <a href='https://hackpad.com/Composer-Drupal-xNseeMzik0c'>Composer & Drupal</a>"
-				]
-			}
-		]
+  "title": "Welcome to Drupal.work!",
+  "description": "Drupal is rock. Let's study together",
+  "authorname": "Andy Truong",
+  "authorwebsite": "http://v3k.net/",
+  "when": "Thu, 12 Feb 2015 16:52:05 GMT",
+  "img": "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xpa1/t31.0-8/1669953_808871765789853_9185670025657170320_o.png",
+  "titlefont": "Ubuntu",
+  "bodyfont": "Georgia",
+  "subs": [
+    "I am Andy Truong. I want sharing my Drupal knowlege!",
+    {
+      "title": "My presentations",
+      "subs": [
+        "- <a href='http://slides.com/andytruong/drupal-8'>Drupal 8</a>",
+        "- <a href='http://slides.com/andytruong/psr-0-psr-4-and-composer'>PSR-0, PSR-4 & xAutoload module</a>",
+        "- <a href='https://hackpad.com/Entity-API-mwibBSkJ2uK'>Entity API</a>",
+        "- <a href='https://hackpad.com/Composer-Drupal-xNseeMzik0c'>Composer & Drupal</a>",
+        "- <a href='https://hackpad.com/Event-dispatcher-rScfEsuXLWn'>Observer design pattern, Symfony2 Event dispatcher component</a>"
+        ]
+      }
+    ]
 }
