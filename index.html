@@ -1,330 +1,315 @@
 <html>
-	<head>
-		<title>drupal.work: open source essay reader</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		
-		<script src="http://fargo.io/code/jquery-1.9.1.min.js"></script>
-		<link href="http://fargo.io/code/bootstrap.css" rel="stylesheet">
-		<script src="http://fargo.io/code/bootstrap.min.js"></script>
-		<link rel="stylesheet" href="http://fargo.io/code/fontAwesome/css/font-awesome.min.css"/>
-		<link href="http://fargo.io/code/ubuntuFont.css" rel="stylesheet" type="text/css">
-		<script src="http://fargo.io/code/node/shared/utils.js"></script>
-		<script src="http://fargo.io/code/node/shared/alertdialog.js"></script>
-		<script src="http://fargo.io/code/markdownConverter.js"></script>
-		
-		<!-- Facebook metadata -->
-			<meta property="og:url" content="http://drupal.work/" />
-			<meta property="og:type" content="website" />
-			<meta property="og:title" content="drupal.work" />
-			<meta property="og:description" content="An easy open source way to create nice-looking web pages for essays." />
-			<meta property="og:image" content="http://scripting.com/2015/02/12/beatles.png" />
-			<meta property="og:site_name" content="drupal.work" />
-		<!-- Twitter metadata -->
-			<meta name="twitter:card" content="summary_large_image">
-			<meta name="twitter:site" content="@thehongtt">
-			<meta name="twitter:title" content="drupal.work">
-			<meta name="twitter:description" content="An easy open source way to create nice-looking web pages for essays.">
-			<meta name="twitter:image:src" content="http://scripting.com/2015/02/12/beatles.png">
-		
-		<script>
-			var appConsts = {
-				productname: "Drupal.work",
-				productnameForDisplay: "drupal.work",
-				domain: "drupal.work", 
-				version: "0.49"
-				}
-			var defaultImageUrl = "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xpa1/t31.0-8/1669953_808871765789853_9185670025657170320_o.png";
-			
-			function everySecond () {
-      }
-			function initGoogleAnalytics () {
-				(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-				
-				ga('create', 'UA-39531990-1', appConsts.domain);
-				ga('send', 'pageview');
-				}
-			function startup () {
-				var urlparam = decodeURIComponent (getURLParameter ("url")), urlEssay = "essay.json", jstruct, imgurl = defaultImageUrl;;
-				var markdown = new Markdown.Converter (), now = new Date (), flmarkdown;
-				console.log ("startup");
-				$("#idVersionNumber").html ("<a href=\"https://github.com/scripting/myWord\" target=\"_blank\">v" + appConsts.version + "</a>");
-				initGoogleAnalytics (); 
-				if (urlparam != "null") {
-					urlEssay = urlparam;
-					}
-				readHttpFile (urlEssay, function (s) {
-					try {
-						jstruct = JSON.parse (s);
-						}
-					catch (err) {
-						alertDialog (err + ". Try using <a href=\"http://jsonlint.com/\" target=\"_blank\">jsonlint</a> to find the error in the JSON file.");
-						return;
-						}
-					
-					flmarkdown = getBoolean (jstruct.flMarkdown); //2/13/15 by DW
-					
-					//image
-						if (jstruct.img != undefined) {
-							imgurl = jstruct.img;
-							}
-						$("#idBackgroundImage").css ("background-image", "url(" + imgurl + ")");
-					//title
-						if (jstruct.title != undefined) {
-							$("#idPageTitle").html (jstruct.title);
-							document.title = appConsts.productnameForDisplay + ": " + jstruct.title;
-							}
-					//fonts
-						if (jstruct.titlefont != undefined) {
-							$("#idPageTopText").css ("font-family", jstruct.titlefont);
-							}
-						if (jstruct.bodyfont != undefined) {
-							$("#idEssayText").css ("font-family", jstruct.bodyfont);
-							}
-						
-					//byline
-						if (jstruct.authorname != undefined) {
-							var author = jstruct.authorname, byline;
-							if (jstruct.authorwebsite != undefined) {
-								author = "<a href=\"" + jstruct.authorwebsite + "\">" + author + "</a>";
-								}
-							byline = "By " + author;
-							if (jstruct.when != undefined) {
-								var whenstring;
-								if (sameDay (new Date (jstruct.when), now)) {
-									whenstring = " at ";
-									}
-								else {
-									whenstring = " on ";
-									}
-								byline += whenstring + viewDate (jstruct.when);
-								}
-							$("#idPageByline").html (byline + ".");
-							}
-					//description
-						if (jstruct.description != undefined) {
-							$("#idPageDescription").html (jstruct.description);
-							}
-					//essay text
-						var essaytext = "";
-						function dolist (thelist) {
-							for (var i = 0; i < thelist.length; i++) {
-								var sub = thelist [i];
-								if (typeof sub == "string") {
-									if (flmarkdown) {
-										essaytext += sub + "\n\n";
-										}
-									else {
-										essaytext += "<p>" +  sub + "</p>";
-										}
-									}
-								else {
-									if (sub.title != undefined) {
-										essaytext += "<div class=\"divSubhead\">" + sub.title + "</div>";
-										}
-									if (sub.subs != undefined) {
-										dolist (sub.subs);
-										}
-									}
-								}
-							}
-						dolist (jstruct.subs);
-						
-						if (flmarkdown) {
-							console.log ("startup: essay text before Markdown processing == " + essaytext);
-							essaytext = "<div class=\"divMarkdownText\">" + markdown.makeHtml (essaytext) + "</div>";
-							}
-						
-						$("#idEssayText").html (essaytext);
-					});
-				self.setInterval (function () {everySecond ()}, 1000); 
-				}
-			</script>
-		<style>
-			body {
-				font-family: Ubuntu;
-				font-size: 18px;
-				background-color: whitesmoke;
-				}
-			.divBackgroundImage {
-				position: absolute;
-				width: 100%;
-				height: 400px;
-				margin-left: 0;
-				margin-top: 0;
-				border-top: 1px solid silver;
-				z-index: 0;
-				
-				-webkit-background-size: cover;
-				-moz-background-size: cover;
-				-o-background-size: cover;
-				background-size: cover;
-				background-position: center;
-				background-repeat: no-repeat;
-				
-				background-color: black;
-				}
-			.divTextBackground {
-				position: absolute;
-				top: 120;
-				left: 15%;
-				width: 70%;
-				height: 170px;
-				z-index: 10;
-				background-color: black;
-				opacity: 0.25;
-				}
-			.divPageTopText {
-				position: absolute;
-				top: 120;
-				left: 15%;
-				width: 70%;
-				height: 200px;
-				color: white;
-				padding-top: 3px;
-				padding-left: 20px;
-				padding-left: 3px;
-				z-index: 20;
-				}
-			.divPageTopText a {
-				color: white;
-				}
-			.divPageTitle {
-				font-size: 50px;
-				letter-spacing: -0.02em;
-				font-weight: 700;
-				font-style: normal;
-				letter-spacing: -0.04em;
-				line-height: 1.1;
-				margin-bottom: 8px;
-				color: white;
-				text-shadow: 1px 1px black;
-				}
-			.divPageByline {
-				font-size: 18px;
-				color: white;
-				margin-bottom: .5em;
-				text-shadow: 1px 1px black;
-				}
-			.divPageDescription {
-				font-size: 24px;
-				color: white;
-				margin-top: .5em;
-				height: 3em;
-				line-height: 120%;
-				text-shadow: 1px 1px black;
-				}
-			.divPageBody {
-				position: absolute;
-				top: 400;
-				left: 20%;
-				width: 60%;
-				margin-top: 50px;
-				margin-left: auto;
-				margin-right: auto;
-				margin-bottom: 400px;
-				}
-			.divEssayText {
-				font-family: "Georgia";
-				font-size: 24px;
-				line-height: 145%;
-				}
-			.divSubhead {
-				font-family: "Ubuntu";
-				font-weight: bold;
-				margin-top: 1em;
-				margin-bottom: .15em;
-				}
-			.divMarkdownText h4 {
-				font-size: 24px;
-				margin-top: 1.25em;
-				margin-bottom: .75em;
-				}
-			.divVersionNumber {
-				position: absolute;
-				top: 0;
-				right:0;
-				font-size: 13px;
-				padding: 5px;
-				color: white;
-				z-index: 20;
-				}
-			.divVersionNumber a {
-				color: white;
-				}
-			</style>
-		<style> /* styles for phone */
-			@media only screen 
-			and (min-device-width : 320px) 
-			and (max-device-width : 480px) {
-				.divBackgroundImage {
-					height: 300px;
-					}
-				.divPageTopText {
-					top: 50;
-					width: 80%;
-					left: 10%;
-					}
-				.divTextBackground {
-					top: 100;
-					width: 80%;
-					left: 10%;
-					}
-				.divPageTitle {
-					font-size: 44px;
-					}
-				.divPageDescription {
-					font-size: 18px;
-					line-height: 120%;
-					}
-				.divPageBody {
-					top: 300;
-					width: 90%; 
-					left: 5%;
-					margin-top: 20px;
-					}
-				.divEssayText {
-					font-size: 18px;
-					}
-				.divVersionNumber {
-					position: absolute;
-					padding: 2px;
-					}
-				}
-			</style>
-		</head>
-	<body>
-		<div class="divVersionNumber" id="idVersionNumber">
-			</div>
-		<div class="divMywordPage">
-			<div class="divPageTop">
-				<div class="divBackgroundImage" id="idBackgroundImage">
-					</div>
-				<div class="divTextBackground">
-					</div>
-				<div class="divPageTopText" id="idPageTopText">
-					<div class="divPageByline" id="idPageByline">
-						</div>
-					<div class="divPageTitle" id="idPageTitle">
-						</div>
-					<div class="divPageDescription" id="idPageDescription">
-						</div>
-					</div>
-				</div>
-			<div class="divPageBody">
-				<div class="divEssayText" id="idEssayText">
-					</div>
-				</div>
-			<div class="divPageFooter">
-				</div>
-			</div>
-		<script>
-			$(document).ready (function () {
-				startup ();
-				});
-			</script>
-		</body>
-	</html>
+<head>
+    <title>drupal.work:  open  source  essay  reader</title>
+    <meta  http-equiv="Content-Type"  content="text/html;  charset=utf-8">
+    <meta  name="viewport"  content="width=device-width,  initial-scale=1.0">
+    
+    <script src="http://fargo.io/code/jquery-1.9.1.min.js"></script>
+    <link  href="http://fargo.io/code/bootstrap.css"  rel="stylesheet">
+    <script src="http://fargo.io/code/bootstrap.min.js"></script>
+    <link  rel="stylesheet"  href="http://fargo.io/code/fontAwesome/css/font-awesome.min.css"/>
+    <link  href="http://fargo.io/code/ubuntuFont.css"  rel="stylesheet"  type="text/css">
+    <script src="http://fargo.io/code/node/shared/utils.js"></script>
+    <script src="http://fargo.io/code/node/shared/alertdialog.js"></script>
+    <script src="http://fargo.io/code/markdownConverter.js"></script>
+    
+    <!--  Facebook  metadata  -->
+    <meta  property="og:url"  content="http://drupal.work/"  />
+    <meta  property="og:type"  content="website"  />
+    <meta  property="og:title"  content="drupal.work"  />
+    <meta  property="og:description"  content="An  easy  open  source  way  to  create  nice-looking  web  pages  for  essays."  />
+    <meta  property="og:image"  content="http://scripting.com/2015/02/12/beatles.png"  />
+    <meta  property="og:site_name"  content="drupal.work"  />
+
+    <!--  Twitter  metadata  -->
+    <meta  name="twitter:card"  content="summary_large_image">
+    <meta  name="twitter:site"  content="@thehongtt">
+    <meta  name="twitter:title"  content="drupal.work">
+    <meta  name="twitter:description"  content="An  easy  open  source  way  to  create  nice-looking  web  pages  for  essays.">
+    <meta  name="twitter:image:src"  content="http://scripting.com/2015/02/12/beatles.png">
+    
+    <script>
+        var  appConsts  =  {
+            productname:  "Drupal.work",
+            productnameForDisplay:  "drupal.work",
+            domain:  "drupal.work",  
+            version:  "0.49"
+            }
+        var  defaultImageUrl  =  "https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xpa1/t31.0-8/1669953_808871765789853_9185670025657170320_o.png";
+        
+        function  everySecond  ()  {
+        }
+        function  initGoogleAnalytics  ()  {
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new  Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            
+            ga('create',  'UA-39531990-1',  appConsts.domain);
+            ga('send',  'pageview');
+            }
+        function  startup  ()  {
+            var  urlparam  =  decodeURIComponent  (getURLParameter  ("url")),  urlEssay  =  "essay.json",  jstruct,  imgurl  =  defaultImageUrl;;
+            var  markdown  =  new  Markdown.Converter  (),  now  =  new  Date  (),  flmarkdown;
+            console.log  ("startup");
+            $("#idVersionNumber").html  ("<a  href=\"https://github.com/scripting/myWord\"  target=\"_blank\">v"  +  appConsts.version  +  "</a>");
+            initGoogleAnalytics  ();  
+            if  (urlparam  !=  "null")  {
+                urlEssay  =  urlparam;
+                }
+            readHttpFile  (urlEssay,  function  (s)  {
+                try  {
+                    jstruct  =  JSON.parse  (s);
+                    }
+                catch  (err)  {
+                    alertDialog  (err  +  ".  Try  using  <a  href=\"http://jsonlint.com/\"  target=\"_blank\">jsonlint</a>  to  find  the  error  in  the  JSON  file.");
+                    return;
+                    }
+                
+                flmarkdown  =  getBoolean  (jstruct.flMarkdown);  //2/13/15  by  DW
+                
+                //image
+                    if  (jstruct.img  !=  undefined)  {
+                        imgurl  =  jstruct.img;
+                        }
+                    $("#idBackgroundImage").css  ("background-image",  "url("  +  imgurl  +  ")");
+                //title
+                    if  (jstruct.title  !=  undefined)  {
+                        $("#idPageTitle").html  (jstruct.title);
+                        document.title  =  appConsts.productnameForDisplay  +  ":  "  +  jstruct.title;
+                        }
+                //fonts
+                    if  (jstruct.titlefont  !=  undefined)  {
+                        $("#idPageTopText").css  ("font-family",  jstruct.titlefont);
+                        }
+                    if  (jstruct.bodyfont  !=  undefined)  {
+                        $("#idEssayText").css  ("font-family",  jstruct.bodyfont);
+                        }
+                    
+                //byline
+                    if  (jstruct.authorname  !=  undefined)  {
+                        var  author  =  jstruct.authorname,  byline;
+                        if  (jstruct.authorwebsite  !=  undefined)  {
+                            author  =  "<a  href=\""  +  jstruct.authorwebsite  +  "\">"  +  author  +  "</a>";
+                            }
+                        byline  =  "By  "  +  author;
+                        if  (jstruct.when  !=  undefined)  {
+                            var  whenstring;
+                            if  (sameDay  (new  Date  (jstruct.when),  now))  {
+                                whenstring  =  "  at  ";
+                                }
+                            else  {
+                                whenstring  =  "  on  ";
+                                }
+                            byline  +=  whenstring  +  viewDate  (jstruct.when);
+                            }
+                        $("#idPageByline").html  (byline  +  ".");
+                        }
+                //description
+                    if  (jstruct.description  !=  undefined)  {
+                        $("#idPageDescription").html  (jstruct.description);
+                        }
+                //essay  text
+                    var  essaytext  =  "";
+                    function  dolist  (thelist)  {
+                        for  (var  i  =  0;  i  <  thelist.length;  i++)  {
+                            var  sub  =  thelist  [i];
+                            if  (typeof  sub  ==  "string")  {
+                                if  (flmarkdown)  {
+                                    essaytext  +=  sub  +  "\n\n";
+                                    }
+                                else  {
+                                    essaytext  +=  "<p>"  +    sub  +  "</p>";
+                                    }
+                                }
+                            else  {
+                                if  (sub.title  !=  undefined)  {
+                                    essaytext  +=  "<div class=\"divSubhead\">"  +  sub.title  +  "</div>";
+                                    }
+                                if  (sub.subs  !=  undefined)  {
+                                    dolist  (sub.subs);
+                                    }
+                                }
+                            }
+                        }
+                    dolist  (jstruct.subs);
+                    
+                    if  (flmarkdown)  {
+                        console.log  ("startup:  essay  text  before  Markdown  processing  ==  "  +  essaytext);
+                        essaytext  =  "<div class=\"divMarkdownText\">"  +  markdown.makeHtml  (essaytext)  +  "</div>";
+                        }
+                    
+                    $("#idEssayText").html  (essaytext);
+                });
+            self.setInterval  (function  ()  {everySecond  ()},  1000);  
+            }
+        </script>
+    <style>
+        body  {
+            font-family:  Ubuntu;
+            font-size:  18px;
+            background-color:  whitesmoke;
+            }
+        .divBackgroundImage  {
+            position:  absolute;
+            width:  100%;
+            height:  400px;
+            margin-left:  0;
+            margin-top:  0;
+            border-top:  1px  solid  silver;
+            z-index:  0;
+            
+            -webkit-background-size:  cover;
+            -moz-background-size:  cover;
+            -o-background-size:  cover;
+            background-size:  cover;
+            background-position:  center;
+            background-repeat:  no-repeat;
+            
+            background-color:  black;
+            }
+        .divTextBackground  {
+            position:  absolute;
+            top:  120;
+            left:  15%;
+            width:  70%;
+            height:  170px;
+            z-index:  10;
+            background-color:  black;
+            opacity:  0.25;
+            }
+        .divPageTopText  {
+            position:  absolute;
+            top:  120;
+            left:  15%;
+            width:  70%;
+            height:  200px;
+            color:  white;
+            padding-top:  3px;
+            padding-left:  20px;
+            padding-left:  3px;
+            z-index:  20;
+            }
+        .divPageTopText  a  {
+            color:  white;
+            }
+        .divPageTitle  {
+            font-size:  50px;
+            letter-spacing:  -0.02em;
+            font-weight:  700;
+            font-style:  normal;
+            letter-spacing:  -0.04em;
+            line-height:  1.1;
+            margin-bottom:  8px;
+            color:  white;
+            text-shadow:  1px  1px  black;
+            }
+        .divPageByline  {
+            font-size:  18px;
+            color:  white;
+            margin-bottom:  .5em;
+            text-shadow:  1px  1px  black;
+            }
+        .divPageDescription  {
+            font-size:  24px;
+            color:  white;
+            margin-top:  .5em;
+            height:  3em;
+            line-height:  120%;
+            text-shadow:  1px  1px  black;
+            }
+        .divPageBody  {
+            position:  absolute;
+            top:  400;
+            left:  20%;
+            width:  60%;
+            margin-top:  50px;
+            margin-left:  auto;
+            margin-right:  auto;
+            margin-bottom:  400px;
+            }
+        .divEssayText  {
+            font-family:  "Georgia";
+            font-size:  24px;
+            line-height:  145%;
+            }
+        .divSubhead  {
+            font-family:  "Ubuntu";
+            font-weight:  bold;
+            margin-top:  1em;
+            margin-bottom:  .15em;
+            }
+        .divMarkdownText  h4  {
+            font-size:  24px;
+            margin-top:  1.25em;
+            margin-bottom:  .75em;
+            }
+        .divVersionNumber  {
+            position:  absolute;
+            top:  0;
+            right:0;
+            font-size:  13px;
+            padding:  5px;
+            color:  white;
+            z-index:  20;
+            }
+        .divVersionNumber  a  {
+            color:  white;
+            }
+        </style>
+    <style>  /*  styles  for  phone  */
+        @media  only  screen  
+        and  (min-device-width  :  320px)  
+        and  (max-device-width  :  480px)  {
+            .divBackgroundImage  {
+                height:  300px;
+                }
+            .divPageTopText  {
+                top:  50;
+                width:  80%;
+                left:  10%;
+                }
+            .divTextBackground  {
+                top:  100;
+                width:  80%;
+                left:  10%;
+                }
+            .divPageTitle  {
+                font-size:  44px;
+                }
+            .divPageDescription  {
+                font-size:  18px;
+                line-height:  120%;
+                }
+            .divPageBody  {
+                top:  300;
+                width:  90%;  
+                left:  5%;
+                margin-top:  20px;
+                }
+            .divEssayText  {
+                font-size:  18px;
+                }
+            .divVersionNumber  {
+                position:  absolute;
+                padding:  2px;
+                }
+            }
+        </style>
+    </head>
+<body>
+    <div class="divVersionNumber" id="idVersionNumber"></div>
+    <div class="divMywordPage">
+        <div class="divPageTop">
+            <div class="divBackgroundImage" id="idBackgroundImage"></div>
+            <div class="divTextBackground"></div>
+            <div class="divPageTopText" id="idPageTopText">
+                <div class="divPageByline" id="idPageByline"></div>
+                <div class="divPageTitle" id="idPageTitle"></div>
+                <div class="divPageDescription" id="idPageDescription"></div></div></div>
+        <div class="divPageBody">
+            <div class="divEssayText" id="idEssayText"></div></div>
+        <div class="divPageFooter"></div>
+        </div>
+    <script> $(document).ready  (function  ()  { startup  (); });</script>
+</body></html>
